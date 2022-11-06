@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/ToDoList.sol": {
+      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.9;\n\n// Uncomment this line to use console.log\n// import \"hardhat/console.sol\";\n\ncontract ToDoList {\n    uint256 public _idUser;\n    address public ownerOfContract;\n    address[] public creators;\n    string[] public message;\n    uint256[] public messageId;\n\n    struct ToDoListApp {\n        address account;\n        uint256 userId;\n        string message;\n        bool completed;\n    }\n\n    event ToDoEvent(\n        address indexed account,\n        uint256 indexed userId,\n        string message,\n        bool completed\n    );\n\n    mapping(address => ToDoListApp) public toDoListApps;\n\n    constructor() {\n        ownerOfContract = msg.sender;\n    }\n\n    function inc() internal {\n        _idUser++;\n    }\n\n    function createList(string calldata _message) external {\n        inc();\n\n        uint256 idNumber = _idUser;\n        ToDoListApp storage toDo = toDoListApps[msg.sender];\n\n        toDo.account = msg.sender;\n        toDo.message = _message;\n        toDo.completed = false;\n        toDo.userId = idNumber;\n\n        creators.push(msg.sender);\n        message.push(_message);\n        messageId.push(idNumber);\n\n        emit ToDoEvent(msg.sender, toDo.userId, _message, toDo.completed);\n    }\n\n    function getCreatorData(address _address)\n        public\n        view\n        returns (\n            address,\n            uint256,\n            string memory,\n            bool\n        )\n    {\n        ToDoListApp memory singleUserData = toDoListApps[_address];\n\n        return (\n            singleUserData.account,\n            singleUserData.userId,\n            singleUserData.message,\n            singleUserData.completed\n        );\n    }\n\n    function getAddress() external view returns (address[] memory) {\n        return creators;\n    }\n\n    function getMessage() external view returns (string[] memory) {\n        return message;\n    }\n\n    function toggle(address _creator) public {\n        ToDoListApp storage singleUserData = toDoListApps[_creator];\n        singleUserData.completed = !singleUserData.completed;\n    }\n\n    fallback() external payable {}\n\n    receive() external payable {}\n\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
